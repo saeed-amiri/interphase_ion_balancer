@@ -115,7 +115,6 @@ import pandas as pd
 import logger
 import cpuconfig
 import gro_to_df as grof
-import pdb_to_df as pdbf
 import read_param as param
 import get_interface as pdb_surf
 from colors_text import TextColor as bcolors
@@ -152,7 +151,7 @@ class ProcessData:
         Initialize the ProcessData object.
 
         Parameters:
-            fname (str): Name of the pdb file.
+            fname (str): Name of the gro file.
             log (Logger): The logger object to log messages.
         """
         # Read parameters from the param file
@@ -205,10 +204,7 @@ class ProcessData:
         Returns:
             typing.Any: The atoms data.
         """
-        if self.param['FILE'] == 'PDB':
-            # Load atoms data from PDB file
-            atoms = pdbf.Pdb(fname, log).atoms
-        elif self.param['FILE'] == 'GRO':
+        if self.param['FILE'] == 'GRO':
             # Load atoms data from GRO file
             gro = grof.ReadGro(fname, log)
             atoms = gro.gro_data
