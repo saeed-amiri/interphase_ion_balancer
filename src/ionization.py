@@ -119,7 +119,7 @@ class IonizationSol(get_data.ProcessData):
         self.info_msg = 'Message:\n'
         self.info_msg += '\tFinding poistions for new ions\n'
         self.ion_poses, self.ion_velos = self.ionize_water()
-        self.up_wall_ions = self.update_up_wall_ions()
+        self.updated_ions = self.update_up_wall_ions()
         self.__write_msg(log)
         self.info_msg = ''  # clean the msg
 
