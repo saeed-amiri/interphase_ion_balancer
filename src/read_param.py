@@ -186,7 +186,6 @@ class ReadParam:
             names = itps.split(',')
             aptes_list.append(names[1].strip())
             cores_list.append(names[2].strip())
-        self.param['itp_files'] = files_list
         self.param['aptes'] = aptes_list
         self.param['cores'] = cores_list
         # Log the message containing the parameters read from the file.
