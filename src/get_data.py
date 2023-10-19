@@ -91,6 +91,7 @@ class ProcessData:
     np_depth: np.float64  # Lowest point of the np
     ion_depth: np.float64  # Lowest point of the ions
     wall_z: float  # z location of the wall
+    up_wall_ions: pd.DataFrame  # Ion above the wall to be replaced``
     title: str  # Name of the system; if the file is gro
     pbc_box: str  # PBC of the system; if the file is gro
 
@@ -122,13 +123,14 @@ class ProcessData:
 
         # Get the lowset point of the np
         self.np_depth = self.get_depth('APT')
-        
+
         # Get the lowest point of the ions
         self.ion_depth = self.get_depth('CLA')
 
         self.wall_z = self.set_wall_location(log)
+
         # Get ions between interface and wall
-        self.__get_ions(log)
+        self.up_wall_ions = self.__get_ions()
 
         # Write and log the initial message
         self.__write_msg(log)
@@ -239,10 +241,10 @@ class ProcessData:
         self.info_msg += f'\tThe wall is set at `{wall_z}`'
         return wall_z
 
-    def __get_ions(self,
-                   log: logger.logging.Logger
-                   ) -> None:
+    def __get_ions(self) -> pd.DataFrame:
         """get ions above the wall"""
+        df_ion: pd.DataFrame = self.residues_atoms['CLA']
+        return df_ion[df_ion['z'] > self.wall_z]
 
     def get_unique_residue_names(self) -> list[str]:
         """
