@@ -90,6 +90,7 @@ class ProcessData:
     np_diameter: np.float64  # Diameter of NP, based on APTES positions
     np_depth: np.float64  # Lowest point of the np
     ion_depth: np.float64  # Lowest point of the ions
+    wall_z: float  # z location of the wall
     title: str  # Name of the system; if the file is gro
     pbc_box: str  # PBC of the system; if the file is gro
 
@@ -124,6 +125,10 @@ class ProcessData:
         
         # Get the lowest point of the ions
         self.ion_depth = self.get_depth('CLA')
+
+        self.wall_z = self.set_wall_location(log)
+        # Get ions between interface and wall
+        self.__get_ions(log)
 
         # Write and log the initial message
         self.__write_msg(log)
@@ -221,6 +226,23 @@ class ProcessData:
                   ) -> np.float64:
         """returns the lowest point of the np in the water phase"""
         return np.min(self.residues_atoms[res]['z'])
+
+    def set_wall_location(self,
+                          log: logger.logging.Logger
+                          ) -> float:
+        """set the place of the wall"""
+        wall_z: float = self.np_depth - self.param['WALL_NP_DISTANCE']
+        if wall_z < self.ion_depth:
+            log.error(
+                msg := f'\tThe wall is lower than possible value `{wall_z}`\n')
+            sys.exit(f'{bcolors.FAIL}{msg}{bcolors.ENDC}')
+        self.info_msg += f'\tThe wall is set at `{wall_z}`'
+        return wall_z
+
+    def __get_ions(self,
+                   log: logger.logging.Logger
+                   ) -> None:
+        """get ions above the wall"""
 
     def get_unique_residue_names(self) -> list[str]:
         """
