@@ -6,10 +6,8 @@ The ProcessData class is designed to efficiently process data from a
 pdb or gro file and extract relevant sections of data for different
 residues or residue groups. It creates separate data frames for diffe-
 rent residues or groups of residues and performs various operations to
-analyze and manipulate the data. The class utilizes multiprocessing to
-improve performance and is capable of finding unprotonated APTES groups
-at the interface, calculating the diameter of nanoparticles (NPs) based
-on APTES positions, and setting the interface range.
+analyze and manipulate the data. Calculating the diameter of nanopart-
+icles (NPs) basedv on APTES positions.
 
 Attributes:
     atoms (pd.DataFrame): A pandas DataFrame containing data for all
@@ -81,8 +79,6 @@ import cpuconfig
 import gro_to_df as grof
 import read_param as param
 from colors_text import TextColor as bcolors
-if typing.TYPE_CHECKING:
-    from get_interface import WrapperGetSurface
 
 
 class ProcessData:
