@@ -19,9 +19,14 @@ Note:
 
 import sys
 import logger
-import gro_to_df as gro
+import update_residues_gro
+import write_gro_file
 
 
 if __name__ == "__main__":
-    GRO_ATOMS = \
-        gro.ReadGro(sys.argv[1], log=logger.setup_logger('balancer.log'))
+    GRO_ATOMS = update_residues_gro.UpdateResidues(
+        sys.argv[1], log=logger.setup_logger('balancer.log'))
+    write_gro_file.write_gromacs_gro(gro_data=GRO_ATOMS.combine_residues,
+                                     filename='system_ion_balanced.gro',
+                                     title=GRO_ATOMS.title,
+                                     pbc_box=GRO_ATOMS.pbc_box)
