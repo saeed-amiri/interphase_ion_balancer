@@ -31,11 +31,6 @@ Methods:
         Calculate the maximum radius of the nanoparticle (NP) based on
         APTES positions.
 
-    calculate_np_xyz_range(aptes_atoms: pd.DataFrame) ->
-    tuple[tuple[float, float], tuple[float, float], tuple[float, float]]:
-        Calculate the x, y, and z ranges of the nanoparticle (NP)
-        based on APTES coordinates.
-
     get_unique_residue_names() -> list[str]:
         Get the list of unique residue names in the system.
 
@@ -49,10 +44,6 @@ Private Methods:
     _get_residues_atoms(residues: list[str]) -> dict[str, pd.DataFrame]:
         Return a dictionary of all the residues with their atoms
         information.
-
-    _get_inside_box(xrange: tuple[float, float], yrange: tuple[float,
-    float], zrange: tuple[float, float]) -> pd.DataFrame:
-        Get atoms inside the box defined by the given x, y, and z ranges.
 
     _write_msg(log: logger.logging.Logger) -> None:
         Write and log messages.
@@ -97,6 +88,7 @@ class ProcessData:
     param: dict[str, typing.Any]  # All the parameters from input file
     residues_atoms: dict[str, pd.DataFrame]  # Atoms info for each residue
     np_diameter: np.float64  # Diameter of NP, based on APTES positions
+    np_depth: np.float64  # Lowest point of the np
     title: str  # Name of the system; if the file is gro
     pbc_box: str  # PBC of the system; if the file is gro
 
@@ -125,6 +117,7 @@ class ProcessData:
 
         # Get the diameter of the NP
         self.np_diameter = self.calculate_maximum_np_radius()
+        self.np_depth = self.get_np_depth()
 
         # Write and log the initial message
         self.__write_msg(log)
@@ -211,12 +204,6 @@ class ProcessData:
         residues_atoms: dict[str, pd.DataFrame] = \
             self.__get_residues_atoms(residues)
 
-        # Get the atoms in the bounding box enclosing the NP and add
-        # them to the dictionary
-        for aptes in self.param['aptes']:
-            residues_atoms[f'box_{aptes}'] = \
-                self.__get_np_box(residues_atoms, aptes)
-
         return residues_atoms
 
     def __get_residues_atoms(self,
@@ -240,90 +227,6 @@ class ProcessData:
             residues_atoms[res] = self.atoms[self.atoms['residue_name'] == res]
         return residues_atoms
 
-    def __get_np_box(self,
-                     residues_atoms: dict[str, pd.DataFrame],
-                     aptes: str  # Name of the aptes chains
-                     ) -> pd.DataFrame:
-        """
-        Get area around NP and obtain a box of all the residues in that
-        box.
-
-        Parameters:
-            residues_atoms (Dict[str, pd.DataFrame]): A dictionary
-            containing pandas DataFrames for each residue's atoms.
-
-        Returns:
-            pd.DataFrame: A DataFrame containing atoms inside the
-            bounding box around the NP.
-        """
-        xrange: tuple[float, float]  # Range of NP in x direction
-        yrange: tuple[float, float]  # Range of NP in y direction
-        zrange: tuple[float, float]  # Range of NP in z direction
-        # Get the x, y, and z ranges of the NP using  calculate_np_xyz_range
-        xrange, yrange, zrange = \
-            self.calculate_np_xyz_range(residues_atoms[aptes])
-        # Get the atoms inside the bounding box using the __get_inside_box
-        # method.
-        return self.__get_inside_box(xrange, yrange, zrange)
-
-    def __get_inside_box(self,
-                         xrange: tuple[float, float],  # Range of NP in x
-                         yrange: tuple[float, float],  # Range of NP in y
-                         zrange: tuple[float, float]  # Range of NP in z
-                         ) -> pd.DataFrame:
-        """
-        Get atoms inside the box defined by the given x, y, and z anges.
-
-        Parameters:
-            xrange (tuple[float, float]): Range of the NP in the x
-                                          direction.
-            yrange (tuple[float, float]): Range of the NP in the y
-                                          direction.
-            zrange (tuple[float, float]): Range of the NP in the z
-                                          direction.
-
-        Returns:
-            pd.DataFrame: A DataFrame containing atoms inside the
-            specified box.
-        """
-        # Increase the box size in each direction by this value.
-        epsilon: float = 3
-        # Filter the atoms DataFrame to get atoms within the specified
-        # box range and return them.
-        atoms_box = self.atoms[
-            (self.atoms['x'] >= xrange[0] - epsilon) &
-            (self.atoms['x'] <= xrange[1] + epsilon) &
-            (self.atoms['y'] >= yrange[0] - epsilon) &
-            (self.atoms['y'] <= yrange[1] + epsilon) &
-            (self.atoms['z'] >= zrange[0] - epsilon) &
-            (self.atoms['z'] <= zrange[1] + epsilon)
-        ]
-        return atoms_box
-
-    @staticmethod
-    def calculate_np_xyz_range(aptes_atoms: pd.DataFrame  # All APTES atoms
-                               ) -> tuple[tuple[float, float],
-                                          tuple[float, float],
-                                          tuple[float, float]]:
-        """
-        Get the xyz range of the NP.
-
-        Parameters:
-            aptes_atoms (pd.DataFrame): All APTES atoms DataFrame.
-
-        Returns:
-            Tuple[Tuple[float, float], Tuple[float, float],
-            Tuple[float, float]]:
-            A tuple containing the x, y, and z ranges of the NP.
-        """
-        xrange: tuple[float, float] = \
-            (aptes_atoms['x'].min(), (aptes_atoms['x'].max()))
-        yrange: tuple[float, float] = \
-            (aptes_atoms['y'].min(), (aptes_atoms['y'].max()))
-        zrange: tuple[float, float] = \
-            (aptes_atoms['z'].min(), (aptes_atoms['z'].max()))
-        return xrange, yrange, zrange
-
     def calculate_maximum_np_radius(self) -> np.float64:
         """get the maximum radius of NP, since APTES are most outward,
         here only looking at APTES residues"""
@@ -339,6 +242,10 @@ class ProcessData:
         self.info_msg += \
             f'\tMaximum radius of between all NPs: `{max_diameter/2}`\n'
         return max_diameter
+
+    def get_np_depth(self) -> np.float64:
+        """returns the lowest point of the np in the water phase"""
+        return np.min(self.residues_atoms['APT']['z'])
 
     def get_unique_residue_names(self) -> list[str]:
         """
