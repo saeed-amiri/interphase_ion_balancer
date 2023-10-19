@@ -109,6 +109,7 @@ class IonizationSol(get_data.ProcessData):
     info_msg: str  # Message to pass for logging and writing
     ion_poses: list[np.ndarray]  # Positoin for ions
     ion_velos: list[np.ndarray]  # Velocity for ions
+    updated_ions: pd.DataFrame  # Updated ions
 
     def __init__(self,
                  fname: str,  # Name of the pdb file
@@ -118,6 +119,7 @@ class IonizationSol(get_data.ProcessData):
         self.info_msg = 'Message:\n'
         self.info_msg += '\tFinding poistions for new ions\n'
         self.ion_poses, self.ion_velos = self.ionize_water()
+        self.up_wall_ions = self.update_up_wall_ions()
         self.__write_msg(log)
         self.info_msg = ''  # clean the msg
 
@@ -447,12 +449,24 @@ class IonizationSol(get_data.ProcessData):
         y_dims = np.array([np.min(sol_atoms['y']), np.max(sol_atoms['y'])])
         z_dims = np.array([z_min, z_max])
         self.info_msg += \
-            f'Section size for moving ions, max: {z_max}, min:{z_min}'
+            f'\tSection size to move ions:\n\t\tmax: {z_max}, min: {z_min}\n'
         return x_dims, y_dims, z_dims
 
     def __get_sol_phase_atoms(self) -> pd.DataFrame:
         """get all the atom below wall, in the water section"""
         return self.atoms[self.atoms['z'] < self.wall_z]
+
+    def update_up_wall_ions(self) -> pd.DataFrame:
+        """replace the poisitons and velocities of the ions in the df"""
+        pos_columns: list[str] = ['x', 'y', 'z']
+        vel_columns: list[str] = ['vx', 'vy', 'vz']
+        xyz_df = pd.DataFrame(self.ion_poses, columns=pos_columns)
+        vxyz_df = pd.DataFrame(self.ion_velos, columns=vel_columns)
+        df_up: pd.DataFrame = self.up_wall_ions.copy()
+        for pos, vel in zip(pos_columns, vel_columns):
+            df_up[pos] = xyz_df[pos].values
+            df_up[vel] = vxyz_df[vel].values
+        return df_up
 
     def __write_msg(self,
                     log: logger.logging.Logger,  # To log info in it
