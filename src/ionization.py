@@ -60,13 +60,13 @@ Methods:
         Find the best place for ions in each box.
 
     __get_chunk_interval(self, x_dims: np.ndarray, y_dims: np.ndarray,
-    z_dims: np.ndarray, n_protons: int) -> tuple[list[tuple[np.float64,
+    z_dims: np.ndarray, nr_ions: int) -> tuple[list[tuple[np.float64,
     np.float64]], list[tuple[np.float64, np.float64]],
     list[tuple[np.float64, np.float64]]]:
         Get dimensions of each chunk box and return the dimensions of
         each chunk box.
 
-    __get_chunk_numbers(self, chunk_num: int, n_protons: int) ->
+    __get_chunk_numbers(self, chunk_num: int, nr_ions: int) ->
                         tuple[int, int, int]:
         Find the best numbers for dividing the box into chunks.
 
@@ -93,12 +93,12 @@ import multiprocessing as multip
 from scipy.spatial import cKDTree, KDTree
 import numpy as np
 import pandas as pd
-import protonating as proton
 import logger
+import get_data
 from colors_text import TextColor as bcolors
 
 
-class IonizationSol(proton.FindHPosition):
+class IonizationSol(get_data.ProcessData):
     """
     The IonizationSol class ionizes the water phase of the system by
     placing counterions in unoccupied spaces within the water section,
@@ -136,18 +136,18 @@ class IonizationSol(proton.FindHPosition):
         ion_velos: list[np.ndarray]  # Main velocities for the ions
         d_ions: list[float]  # Distance of the new ions with their nighbours
 
-        # Find the all the atoms in the water (sol) phase
+        # Find the all the atoms in the water (sol) phase bellow
         sol_atoms: pd.DataFrame = self.__get_sol_phase_atoms()
 
         # Get the dimension of the ares
         x_dims, y_dims, z_dims = self.__get_box_size(sol_atoms)
 
         # Get the number of the chains to be protonated
-        n_protonation: int  # Number of the protonation
-        n_protonation = sum(len(lst) for lst in self.unprot_aptes_ind.values())
+        nr_up_wall_ions: int  # Number of the protonation
+        nr_up_wall_ions = len(self.up_wall_ions)
         # Get the chunk boxes to find atoms in them
         x_chunks, y_chunks, z_chunks = \
-            self.__get_chunk_interval(x_dims, y_dims, z_dims, n_protonation)
+            self.__get_chunk_interval(x_dims, y_dims, z_dims, nr_up_wall_ions)
 
         # Find possible poistions for all the ions
         ion_poses_list, ion_velos_list, d_ions = \
@@ -160,7 +160,7 @@ class IonizationSol(proton.FindHPosition):
             self.__best_ion_selction(ion_poses_tmp,
                                      np.array(ion_velos_list),
                                      d_ions,
-                                     n_protonation)
+                                     nr_up_wall_ions)
         return ion_poses, ion_velos
 
     def __check_poses(self,
@@ -375,7 +375,7 @@ class IonizationSol(proton.FindHPosition):
                              x_dims: np.ndarray,  # Dimensions of sol box in x
                              y_dims: np.ndarray,  # Dimensions of sol box in y
                              z_dims: np.ndarray,  # Dimensions of sol box in z
-                             n_protons: int  # Number of protonated chains
+                             nr_ions: int  # Number of ions to replace
                              ) -> tuple[list[tuple[np.float64, np.float64]],
                                         list[tuple[np.float64, np.float64]],
                                         list[tuple[np.float64, np.float64]]]:
@@ -387,7 +387,7 @@ class IonizationSol(proton.FindHPosition):
             x_dims (np.ndarray): Dimensions of the sol box in the x-axis.
             y_dims (np.ndarray): Dimensions of the sol box in the y-axis.
             z_dims (np.ndarray): Dimensions of the sol box in the z-axis.
-            n_protons (int): Number of protonated chains.
+            nr_ions (int): Number of ions to replace.
 
         Returns:
                 A tuple containing three lists:
@@ -398,9 +398,9 @@ class IonizationSol(proton.FindHPosition):
         x_lim: float = x_dims[1] - x_dims[0]
         y_lim: float = y_dims[1] - y_dims[0]
         z_lim: float = z_dims[1] - z_dims[0]
-        chunk_num: int = int(np.cbrt(n_protons))
+        chunk_num: int = int(np.cbrt(nr_ions))
         chunk_axis: tuple[int, int, int] = \
-            self.__get_chunk_numbers(chunk_num, n_protons)
+            self.__get_chunk_numbers(chunk_num, nr_ions)
         x_chunks: list[tuple[np.float64, np.float64]] = \
             self.__get_axis_chunk(x_dims, x_lim, chunk_axis[0])  # Chunks range
         y_chunks: list[tuple[np.float64, np.float64]] = \
@@ -411,15 +411,15 @@ class IonizationSol(proton.FindHPosition):
 
     def __get_chunk_numbers(self,
                             chunk_num: int,  # initial chunk number in each ax
-                            n_protons: int  # number of protonated chains
+                            nr_ions: int  # number of ions to replace
                             ) -> tuple[int, int, int]:
         """find best numbers for dividing the box into chunks"""
         chunck_axis: tuple[int, int, int]
-        if chunk_num**3 == n_protons:
+        if chunk_num**3 == nr_ions:
             chunck_axis = (chunk_num, chunk_num, chunk_num)
-        elif chunk_num**3 < n_protons:
+        elif chunk_num**3 < nr_ions:
             x_chunk, y_chunk, z_chunk = chunk_num, chunk_num, chunk_num
-            while x_chunk * y_chunk * z_chunk < n_protons:
+            while x_chunk * y_chunk * z_chunk < nr_ions:
                 x_chunk += 1
             chunck_axis = x_chunk, y_chunk, z_chunk
         return chunck_axis
@@ -437,19 +437,20 @@ class IonizationSol(proton.FindHPosition):
             chunk_intervals.append((x_0, x_1))
         return chunk_intervals
 
-    @staticmethod
-    def __get_box_size(sol_atoms: pd.DataFrame  # All the atoms below NP
+    def __get_box_size(self,
+                       sol_atoms: pd.DataFrame  # All the atoms below NP
                        ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         """get the dimension of the sol box (water and ions)"""
+        z_min: float = self.ion_depth + self.param['BOX_ION_DISTANCE']
+        z_max: float = self.wall_z
         x_dims = np.array([np.min(sol_atoms['x']), np.max(sol_atoms['x'])])
         y_dims = np.array([np.min(sol_atoms['y']), np.max(sol_atoms['y'])])
-        z_dims = np.array([np.min(sol_atoms['z']), np.max(sol_atoms['z'])])
+        z_dims = np.array([z_min, z_max])
         return x_dims, y_dims, z_dims
 
     def __get_sol_phase_atoms(self) -> pd.DataFrame:
-        """get all the atom below interface, in the water section"""
-        tresh_hold = float(self.param['INTERFACE']-self.np_diameter)
-        return self.atoms[self.atoms['z'] < tresh_hold]
+        """get all the atom below wall, in the water section"""
+        return self.atoms[self.atoms['z'] < self.wall_z]
 
     def __write_msg(self,
                     log: logger.logging.Logger,  # To log info in it
