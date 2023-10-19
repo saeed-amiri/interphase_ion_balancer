@@ -244,6 +244,8 @@ class ProcessData:
     def __get_ions(self) -> pd.DataFrame:
         """get ions above the wall"""
         df_ion: pd.DataFrame = self.residues_atoms['CLA']
+        self.info_msg += \
+            f'\tNumber of the ions to replace is `{len(df_ion.index)}`'
         return df_ion[df_ion['z'] > self.wall_z]
 
     def get_unique_residue_names(self) -> list[str]:
