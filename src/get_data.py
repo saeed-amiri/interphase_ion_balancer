@@ -96,8 +96,6 @@ class ProcessData:
     atoms: pd.DataFrame  # All atoms dataframe
     param: dict[str, typing.Any]  # All the parameters from input file
     residues_atoms: dict[str, pd.DataFrame]  # Atoms info for each residue
-    unproton_aptes: dict[str, pd.DataFrame]  # APTES which should be protonated
-    unprot_aptes_ind: dict[str, list[int]]  # Index of APTES to be protonated
     np_diameter: np.float64  # Diameter of NP, based on APTES positions
     title: str  # Name of the system; if the file is gro
     pbc_box: str  # PBC of the system; if the file is gro
