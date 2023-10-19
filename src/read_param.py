@@ -184,7 +184,6 @@ class ReadParam:
             itp = itp.strip()
             itps = my_tools.drop_string(itp, '[', ']')
             names = itps.split(',')
-            files_list.append(names[0].strip() + '.itp')
             aptes_list.append(names[1].strip())
             cores_list.append(names[2].strip())
         self.param['itp_files'] = files_list
