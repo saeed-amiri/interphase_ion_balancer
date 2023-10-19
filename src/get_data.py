@@ -227,7 +227,10 @@ class ProcessData:
                   res: str  # Name of the residue to get the lowest point
                   ) -> np.float64:
         """returns the lowest point of the np in the water phase"""
-        return np.min(self.residues_atoms[res]['z'])
+        min_pos = np.min(self.residues_atoms[res]['z'])
+        self.info_msg += \
+            f'\tThe lowest pos of residue `{res}` is `{min_pos}`\n'
+        return min_pos
 
     def set_wall_location(self,
                           log: logger.logging.Logger
@@ -238,14 +241,14 @@ class ProcessData:
             log.error(
                 msg := f'\tThe wall is lower than possible value `{wall_z}`\n')
             sys.exit(f'{bcolors.FAIL}{msg}{bcolors.ENDC}')
-        self.info_msg += f'\tThe wall is set at `{wall_z}`'
+        self.info_msg += f'\tThe wall is set at `{wall_z}`\n'
         return wall_z
 
     def __get_ions(self) -> pd.DataFrame:
         """get ions above the wall"""
         df_ion: pd.DataFrame = self.residues_atoms['CLA']
         self.info_msg += \
-            f'\tNumber of the ions to replace is `{len(df_ion.index)}`'
+            f'\tNumber of the ions in the system is `{len(df_ion.index)}`\n'
         return df_ion[df_ion['z'] > self.wall_z]
 
     def get_unique_residue_names(self) -> list[str]:
@@ -270,6 +273,8 @@ class ProcessData:
         Parameters:
             log (Logger): The logger object to log the messages.
         """
+        self.info_msg += \
+            f'\tNumber of ions to replace is `{len(self.up_wall_ions)}`\n'
         print(f'{bcolors.OKCYAN}{ProcessData.__module__}:\n'
               f'\t{self.info_msg}{bcolors.ENDC}')
         log.info(self.info_msg)
