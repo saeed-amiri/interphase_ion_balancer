@@ -26,16 +26,19 @@ within the interface: WHITIN
 @LINE=UPPERBOUND
 the center of mass of the nanoparticle
 @NP_ZLOC=10
-the number of the maximum APTES to protonate -> Optional
-@NUMAPTES=10
-@BETTER_POS=100
+
+distance from nanoparticle for seting the wall in nm
+@WALL_NP_DISTANCE=1.2
+distance from the lowest level of the box, here again we assume water is at bottem
+@BOX_ION_DISTANCE=1
+
 ############### Computation parameters ###########
 Number of points to make to try to put H of new protonation there, around 100
 @NUMSAMPLE=100
 Distance to put between ION and other atoms
 @ION_DISTANCE=1
 Number of times try to find a place for an ion, around 1000
-@ION_ATTEPTS=1000
+@ION_ATTEMPTS=1000
 ####################### DEBUG ###################
 If True (any word will means True!) many data files will be written, with extension "debug"
 @DEBUG=True
