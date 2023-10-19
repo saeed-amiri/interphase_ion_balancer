@@ -446,6 +446,8 @@ class IonizationSol(get_data.ProcessData):
         x_dims = np.array([np.min(sol_atoms['x']), np.max(sol_atoms['x'])])
         y_dims = np.array([np.min(sol_atoms['y']), np.max(sol_atoms['y'])])
         z_dims = np.array([z_min, z_max])
+        self.info_msg += \
+            f'Section size for moving ions, max: {z_max}, min:{z_min}'
         return x_dims, y_dims, z_dims
 
     def __get_sol_phase_atoms(self) -> pd.DataFrame:
