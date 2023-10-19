@@ -1,0 +1,41 @@
+All the distance values are in angestrom and angles in degree
+############### CONSTANT VALUES ##############
+The contact angle of the nanoparticle (NP)
+@ANGLE=90
+Estimate radius of the NP before functionalization with APTES
+@RADIUS=25
+Name of the NP itp files, write them in list of list. The names of the APTES chain and CORE
+should follow the the name of the files. First the name of APTES than the name of the COR
+And seperate them with semicolon, like [file1, APT, COR]; [file2, APU, COS]
+@NP_ITP=[APT_COR, APT, COR]; [APU_COS, APU, COS]
+Topology file
+@TOPOFILE=topol.top
+############### INTERACTIVE VALUES ###########
+intereface location -> caculated by analysing script
+If READ then read it from the READ file, otherwise from the fixed value set in here
+@READ=True
+@FILE=GRO
+If no READ the interface is got from here: (They should set anyway)
+@INTERFACE=12.81
+interface thickness
+@INTERFACE_WIDTH=10.47
+How to select atoms, under intereface: INTERFACE
+under upper bound of the interface: UPPERBOUND
+under lower bound of the interface: LOWERBOUND
+within the interface: WHITIN
+@LINE=UPPERBOUND
+the center of mass of the nanoparticle
+@NP_ZLOC=10
+the number of the maximum APTES to protonate -> Optional
+@NUMAPTES=10
+@BETTER_POS=100
+############### Computation parameters ###########
+Number of points to make to try to put H of new protonation there, around 100
+@NUMSAMPLE=100
+Distance to put between ION and other atoms
+@ION_DISTANCE=1
+Number of times try to find a place for an ion, around 1000
+@ION_ATTEPTS=1000
+####################### DEBUG ###################
+If True (any word will means True!) many data files will be written, with extension "debug"
+@DEBUG=True
