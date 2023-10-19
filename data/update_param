@@ -31,7 +31,7 @@ distance from nanoparticle for seting the wall in nm
 @WALL_NP_DISTANCE=1.2
 distance from the lowest level of the box, here again we assume water is at bottem
 @BOX_ION_DISTANCE=1
-
+@BETTER_POS=100
 ############### Computation parameters ###########
 Number of points to make to try to put H of new protonation there, around 100
 @NUMSAMPLE=100
