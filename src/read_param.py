@@ -88,15 +88,16 @@ class ReadParam:
     info_msg: str = 'Message:\n'  # Message to pass for logging and writing
     fname: str = 'update_param'
     float_keys: list[str] = ["ANGLE", "RADIUS", "INTERFACE",
-                             "INTERFACE_WIDTH", "ION_DISTANCE", "NP_ZLOC"]
-    integer_keys: list[str] = ["NUMSAMPLE", "ION_ATTEMPTS", "BETTER_POS"]
+                             "INTERFACE_WIDTH", "ION_DISTANCE", "NP_ZLOC",
+                             "WALL_NP_DISTANCE", "BOX_ION_DISTANCE"]
+    integer_keys: list[str] = ["ION_ATTEMPTS"]
     boolen_keys: list[str] = ["READ", "DEBUG"]
     files_keys: list[str] = ["TOPOFILE"]
     itp_keys: list[str] = ["NP_ITP"]
     str_keys: list[str] = ["FILE", "LINE"]
     list_keys: list = [float_keys, integer_keys, boolen_keys, files_keys,
                        str_keys, itp_keys]
-    optional_keys: list[str] = ["NUMAPTES"]
+    optional_keys: list[str] = []
 
     def __init__(self,
                  log: logger.logging.Logger
