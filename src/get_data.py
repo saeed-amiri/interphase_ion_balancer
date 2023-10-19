@@ -13,37 +13,37 @@ on APTES positions, and setting the interface range.
 
 Attributes:
     atoms (pd.DataFrame): A pandas DataFrame containing data for all
-    atoms in the system.
+            atoms in the system.
     param (dict[str, float]): A dictionary containing various paramet-
-    ers from an input file.
+            ers from an input file.
     residues_atoms (dict[str, pd.DataFrame]): A dictionary containing
-    pandas DataFrames for each residue's atoms.
-    unproton_aptes (dict[str, pd.DataFrame]): A dictionary containing
-    pandas DataFrames for each residue's atoms in the chains of the
-    unprotonated APTES residues.
-    unprot_aptes_ind (list[int]): A list of integers representing the
-    indices of unprotonated APTES residues to be protonated.
+            pandas DataFrames for each residue's atoms.
+    *unproton_aptes (dict[str, pd.DataFrame]): A dictionary containing
+            pandas DataFrames for each residue's atoms in the chains
+            of the unprotonated APTES residues.
+    *unprot_aptes_ind (list[int]): A list of integers representing the
+            indices of unprotonated APTES residues to be protonated.
     np_diameter (np.float64): The maximum radius of the nanoparticle
-    (NP) based on APTES positions.
+            (NP) based on APTES positions.
     title (str): The name of the system; applicable if the file is in
-    gro format.
+            gro format.
     pbc_box (str): The periodic boundary condition of the system;
-    applicable if the file is in gro format.
+            applicable if the file is in gro format.
 
 Methods:
     __init__(fname: str, log: logger.logging.Logger) -> None:
         Initialize the ProcessData object.
 
-    find_unprotonated_aptes(log: logger.logging.Logger) ->
+    *find_unprotonated_aptes(log: logger.logging.Logger) ->
                             tuple[dict[str, np.ndarray], list[int]]:
         Check and find the unprotonated APTES groups that have N at
         the interface.
 
-    get_aptes_unproto(unprot_aptes_ind: dict[str, list[int]]) ->
+    *get_aptes_unproto(unprot_aptes_ind: dict[str, list[int]]) ->
                       dict[str, pd.DataFrame]:
         Get all atoms in the chains of the unprotonated APTES.
 
-    find_unprotonated_aptes_chains(sol_phase_aptes:
+    *find_unprotonated_aptes_chains(sol_phase_aptes:
                                    dict[str, list[int]]) ->
                                    dict[str, list[int]]:
         Find all the chains at the interface that require protonation.
@@ -57,12 +57,12 @@ Methods:
         Calculate the x, y, and z ranges of the nanoparticle (NP)
         based on APTES coordinates.
 
-    find_interface_z_range(water_surface: typing.Any) ->
+    *find_interface_z_range(water_surface: typing.Any) ->
                            tuple[float, float]:
         Find all the APTES residues at the interface.
 
-    calculate_interface_z_range(interface_z: float, interface_w: float,
-    aptes_com: float) -> tuple[float, float]:
+    *calculate_interface_z_range(interface_z: float, interface_w: float,
+        aptes_com: float) -> tuple[float, float]:
         Set the interface range.
 
     get_unique_residue_names() -> list[str]:
@@ -87,19 +87,19 @@ Private Methods:
         Write and log messages.
 
 Note:
-    - This class is intended to be used with pdb and gro files.
+    - This class is intended to be used with gro files.
     - The class uses multiprocessing to improve performance during
-    certain operations.
+        certain operations.
     - The script contains various methods to analyze and manipulate
-    data related to residues and atoms in the system.
+        data related to residues and atoms in the system.
     - The class provides methods to find unprotonated APTES groups at
-    the interface and calculate the diameter of NPs based on APTES
-    positions.
+        the interface and calculate the diameter of NPs based on APTES
+        positions.
     - The 'param' attribute is populated with parameters from an input
-    file to control various aspects of the analysis.
+        file to control various aspects of the analysis.
     - It is recommended to initialize the class using the '__init__'
-    method with the filename of the pdb or gro file and a logger object
-    for logging messages.
+        method with the filename of the pdb or gro file and a logger object
+        for logging messages.
 
 Example:
     data = \
@@ -210,6 +210,8 @@ class ProcessData:
             atoms = gro.gro_data
             self.title = gro.title
             self.pbc_box = gro.pbc_box
+        else:
+            log.error(f'\nFile type is not correct!\n')
         return atoms
 
     def find_unprotonated_aptes(self,
