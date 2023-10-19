@@ -89,6 +89,7 @@ class ProcessData:
     residues_atoms: dict[str, pd.DataFrame]  # Atoms info for each residue
     np_diameter: np.float64  # Diameter of NP, based on APTES positions
     np_depth: np.float64  # Lowest point of the np
+    ion_depth: np.float64  # Lowest point of the ions
     title: str  # Name of the system; if the file is gro
     pbc_box: str  # PBC of the system; if the file is gro
 
@@ -117,7 +118,12 @@ class ProcessData:
 
         # Get the diameter of the NP
         self.np_diameter = self.calculate_maximum_np_radius()
-        self.np_depth = self.get_np_depth()
+
+        # Get the lowset point of the np
+        self.np_depth = self.get_depth('APT')
+        
+        # Get the lowest point of the ions
+        self.ion_depth = self.get_depth('CLA')
 
         # Write and log the initial message
         self.__write_msg(log)
@@ -156,39 +162,6 @@ class ProcessData:
             log.error(msg := f'\nFile type is not correct: {fin}!\n')
             sys.exit(f'{bcolors.FAIL}{msg}{bcolors.ENDC}')
         return atoms
-
-    @staticmethod
-    def process_chunk(chunk: np.ndarray,  # Chunk of a APTES indices
-                      df_apt: pd.DataFrame  # For the APTES at the interface
-                      ) -> list[int]:
-        """
-        Process a chunk of APTES residues to find unprotonated chains.
-
-        Parameters:
-            chunk (np.ndarray): A chunk of APTES indices to process.
-            df_apt (pd.DataFrame): DataFrame containing APTES atom data.
-
-        Returns:
-            List[int]: A list of integers representing the indices of
-            unprotonated APTES residues within the chunk.
-        """
-        # Initialize an empty list to store unprotonated APTES indices
-        # in the chunk
-        unprotonated_aptes_chunk: list[int] = []
-
-        # Iterate over the APTES indices in the chunk
-        for aptes_index in chunk:
-            # Filter the DataFrame for the current APTES index
-            df_i = df_apt[df_apt['residue_number'] == aptes_index]
-            # Check if 'HN3' is present in 'atom_name' for the current
-            # APTES residue
-            if df_i[df_i['atom_name'].isin(['HN3'])].empty:
-                # If 'HN3' is not present, add the index to the list
-                # of unprotonated APTES
-                unprotonated_aptes_chunk.append(aptes_index)
-
-        # Return the list of unprotonated APTES indices in the chunk
-        return unprotonated_aptes_chunk
 
     def __get_atoms(self) -> dict[str, pd.DataFrame]:
         """Get all the atoms for each residue.
@@ -243,9 +216,11 @@ class ProcessData:
             f'\tMaximum radius of between all NPs: `{max_diameter/2}`\n'
         return max_diameter
 
-    def get_np_depth(self) -> np.float64:
+    def get_depth(self,
+                  res: str  # Name of the residue to get the lowest point
+                  ) -> np.float64:
         """returns the lowest point of the np in the water phase"""
-        return np.min(self.residues_atoms['APT']['z'])
+        return np.min(self.residues_atoms[res]['z'])
 
     def get_unique_residue_names(self) -> list[str]:
         """
