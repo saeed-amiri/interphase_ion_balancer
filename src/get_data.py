@@ -132,6 +132,9 @@ class ProcessData:
         # Get ions between interface and wall
         self.up_wall_ions = self.__get_ions()
 
+        # Write the spatial properties of the groups
+        self.get_z_bounds_and_com('CLA', 'APT')
+
         # Write and log the initial message
         self.__write_msg(log)
 
@@ -228,8 +231,6 @@ class ProcessData:
                   ) -> np.float64:
         """returns the lowest point of the np in the water phase"""
         min_pos = np.min(self.residues_atoms[res]['z'])
-        self.info_msg += \
-            f'\tThe lowest pos of residue `{res}` is `{min_pos}`\n'
         return min_pos
 
     def set_wall_location(self,
@@ -263,6 +264,26 @@ class ProcessData:
         # in the atoms DataFrame.
         residues: list[str] = list(set(self.atoms['residue_name']))
         return residues
+
+    def get_z_bounds_and_com(self,
+                             *args: str
+                             ) -> None:
+        """get max, min, com of the group given"""
+        for res in args:
+            if res not in self.residues_atoms:
+                self.info_msg += \
+                    f"\tWarns: Residue `{res}` not found in residues_atoms.\n"
+                continue
+            self.info_msg += f"\tSpatial properties for residue `{res}`:\n"
+            z_vals = self.residues_atoms[res]["z"]
+            com = \
+                tuple(np.mean(self.residues_atoms[res][dim]) for dim in "xyz")
+            self.info_msg += (
+                f"\t\tThe lowest Z position is `{np.min(z_vals):.3f}`\n"
+                f"\t\tThe highest Z position is `{np.max(z_vals):.3f}`\n"
+                "\t\tThe COM position is "
+                f"`({com[0]:.3f}, {com[1]:.3f}, {com[2]:.3f})`\n"
+            )
 
     def __write_msg(self,
                     log: logger.logging.Logger
