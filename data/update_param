@@ -43,6 +43,8 @@ Number of times try to find a place for an ion, around 1000
 If True (any word will means True!) many data files will be written, with extension "debug"
 @DEBUG=True
 ###################### PLUMED ##################
+name of the ion
+@ION=CLA
 kappa: is an energy constant in internal unit of the code!
 @KAPPA=150
 offset
