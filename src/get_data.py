@@ -106,6 +106,8 @@ class ProcessData:
             fname (str): Name of the gro file.
             log (Logger): The logger object to log messages.
         """
+        self.info_msg += f'\tReading: `{fname}`\n'
+
         # Read parameters from the param file
         self.param = param.ReadParam(log=log).param
 
