@@ -95,7 +95,7 @@ class ReadParam:
     boolen_keys: list[str] = ["READ", "DEBUG"]
     files_keys: list[str] = ["TOPOFILE", "INDEX"]
     itp_keys: list[str] = ["NP_ITP"]
-    str_keys: list[str] = ["FILE", "LINE", "OUTNAME"]
+    str_keys: list[str] = ["FILE", "LINE", "OUTNAME", "ION"]
     list_keys: list = [float_keys, integer_keys, boolen_keys, files_keys,
                        str_keys, itp_keys]
     optional_keys: list[str] = []

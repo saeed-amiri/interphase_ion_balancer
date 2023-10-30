@@ -17,9 +17,7 @@ class WritePlumedInput:
     def __init__(self,
                  log: logger.logging.Logger,
                  parametrs: dict[str, typing.Any],
-                 fout: str = 'plumed_wall.dat'  # Output file name
                  ) -> None:
-        self.fout: str = fout
         self.write_inputs(log, parametrs)
         self.write_log_msg(log)
 
@@ -29,8 +27,9 @@ class WritePlumedInput:
                      ) -> None:
         """write down based on the format"""
         ions_ndx: list[int] = \
-            self.get_atom_indices_from_index_file('index.ndx', 'CLA')
-        with open(self.fout, 'w', encoding='utf8') as f_w:
+            self.get_atom_indices_from_index_file(parameters['INDEX'],
+                                                  parameters['ION'])
+        with open(parameters['OUTNAME'], 'w', encoding='utf8') as f_w:
             f_w.write("# Set walls for the nanoparticles and ions\n\n")
             self.write_np_wall(f_w, log)
             self.write_ions_wall(f_w, ions_ndx, parameters)
