@@ -16,9 +16,9 @@ class WritePlumedInput:
 
     def __init__(self,
                  log: logger.logging.Logger,
-                 parametrs: dict[str, typing.Any],
+                 parameters: dict[str, typing.Any],
                  ) -> None:
-        self.write_inputs(log, parametrs)
+        self.write_inputs(log, parameters)
         self.write_log_msg(log)
 
     def write_inputs(self,
@@ -98,7 +98,7 @@ class WritePlumedInput:
                         my_tools.extract_text_between_square_brackets(line)
                     if section_name is not None:
                         section_name = section_name.strip()
-                        in_residue_section: bool = section_name == residue_name
+                        in_residue_section = section_name == residue_name
                 elif in_residue_section:
                     atom_indices.extend(map(int, line.split()))
         self.info_msg += \
@@ -118,4 +118,4 @@ if __name__ == "__main__":
     import read_param as param
     LOG = logger.setup_logger('plumed.log')
     PARAM = param.ReadParam(log=LOG)
-    WritePlumedInput(log=LOG, parametrs=PARAM.param)
+    WritePlumedInput(log=LOG, parameters=PARAM.param)
