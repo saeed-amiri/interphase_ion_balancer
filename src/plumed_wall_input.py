@@ -14,29 +14,55 @@ class WritePlumedInput:
 
     info_msg: str = 'Messages from WritePlumedInput:\n'
 
-
     def __init__(self,
                  log: logger.logging.Logger,
+                 parametrs: dict[str, typing.Any],
                  fout: str = 'plumed_wall.dat'  # Output file name
                  ) -> None:
         self.fout: str = fout
-        self.write_inputs(log)
+        self.write_inputs(log, parametrs)
         self.write_log_msg(log)
 
     def write_inputs(self,
-                     log: logger.logging.Logger
+                     log: logger.logging.Logger,
+                     parameters: dict[str, typing.Any]
                      ) -> None:
         """write down based on the format"""
-        self.get_atom_indices_from_index_file('index.ndx', 'CLA')
+        ions_ndx: list[int] = \
+            self.get_atom_indices_from_index_file('index.ndx', 'CLA')
         with open(self.fout, 'w', encoding='utf8') as f_w:
             f_w.write("# Set walls for the nanoparticles and ions\n\n")
             self.write_np_wall(f_w, log)
+            self.write_ions_wall(f_w, ions_ndx, parameters)
 
     def write_np_wall(self,
                       f_w: typing.IO,
                       log: logger.logging.Logger
                       ) -> None:
         """write the wall for the nanoparticles"""
+
+    def write_ions_wall(self,
+                        f_w: typing.IO,
+                        ions_ndx: list[int],
+                        parameters: dict[str, typing.Any]
+                        ) -> None:
+        """write the walls for the ions"""
+        for i, index in enumerate(ions_ndx, start=1):
+            ion_name: str = f'ions_{i}'
+            ion_z_bound: tuple[float, float] = (parameters["IONLOW"] - 0.1,
+                                                parameters["IONHIGH"] + 0.1)
+            walls: tuple[str, str] = (f'lwall_{i}: LOWER_WALLS {ion_name}',
+                                      f'uwall_{i}: UPPER_WALLS {ion_name}')
+            f_w.write(f'{ion_name}: '
+                      f'POSITION ATOM={index}\n')
+            for wall, bound in zip(walls, ion_z_bound):
+                f_w.write(f'{wall} '
+                          f'ARG={ion_name}.z AT={bound} '
+                          f'KAPPA={parameters["KAPPA"]} '
+                          f'EXP={parameters["EXP"]} '
+                          f'EPS={parameters["EPS"]} '
+                          f'OFFSET={parameters["OFFSET"]}\n')
+            f_w.write('\n')
 
     def get_atom_indices_from_index_file(self,
                                          index_file_path: str,
@@ -70,4 +96,7 @@ class WritePlumedInput:
 
 
 if __name__ == "__main__":
-    WritePlumedInput(log=logger.setup_logger('plumed.log'))
+    import read_param as param
+    LOG = logger.setup_logger('plumed.log')
+    PARAM = param.ReadParam(log=LOG)
+    WritePlumedInput(log=LOG, parametrs=PARAM.param)
