@@ -90,12 +90,13 @@ class ReadParam:
     float_keys: list[str] = ["ANGLE", "RADIUS", "INTERFACE",
                              "INTERFACE_WIDTH", "ION_DISTANCE", "NP_ZLOC",
                              "WALL_NP_DISTANCE", "BOX_ION_DISTANCE",
-                             "KAPPA", "OFFSET", "IONLOW", "IONHIGH", "NPCOMZ"]
+                             "KAPPA", "OFFSET", "IONLOW", "IONHIGH", "NPCOMZ",
+                             "FX", "FY", "FZ"]
     integer_keys: list[str] = ["ION_ATTEMPTS", "EPS", "EXP"]
     boolen_keys: list[str] = ["READ", "DEBUG"]
     files_keys: list[str] = ["TOPOFILE", "INDEX"]
     itp_keys: list[str] = ["NP_ITP"]
-    str_keys: list[str] = ["FILE", "LINE", "OUTNAME", "ION", "NP"]
+    str_keys: list[str] = ["FILE", "LINE", "OUTNAME", "ION", "NP", "RESFILE"]
     list_keys: list = [float_keys, integer_keys, boolen_keys, files_keys,
                        str_keys, itp_keys]
     optional_keys: list[str] = []
