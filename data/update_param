@@ -42,3 +42,10 @@ Number of times try to find a place for an ion, around 1000
 ####################### DEBUG ###################
 If True (any word will means True!) many data files will be written, with extension "debug"
 @DEBUG=True
+###################### PLUMED ##################
+kappa
+@KAPPA=150
+offset
+@OFFSET=0
+eps
+@EPS=1
