@@ -69,8 +69,8 @@ class WritePlumedInput:
             ion_name: str = f'ions_{i}'
             ion_z_bound: tuple[float, float] = (parameters["IONLOW"] - 0.1,
                                                 parameters["IONHIGH"] + 0.1)
-            walls: tuple[str, str] = (f'lwall_{i}: LOWER_WALLS {ion_name}',
-                                      f'uwall_{i}: UPPER_WALLS {ion_name}')
+            walls: tuple[str, str] = (f'lwall_{i}: LOWER_WALLS',
+                                      f'uwall_{i}: UPPER_WALLS')
             f_w.write(f'{ion_name}: '
                       f'POSITION ATOM={index}\n')
             for wall, bound in zip(walls, ion_z_bound):
