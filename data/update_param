@@ -61,3 +61,13 @@ ions lowest position
 @IONLOW=0.5
 ions highest position
 @IONHIGH=2.5
+name of nanoparticle in index file
+@NP=COR_APT
+np com position
+@NPCOMZ=9.046
+################### Restraints force ##############
+restraints force on atoms
+@FX=0
+@FY=0
+@FZ=5000
+@RESFILE='ION_RESTRAINS.itp'
