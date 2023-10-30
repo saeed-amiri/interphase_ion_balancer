@@ -57,7 +57,8 @@ class WritePlumedInput:
                       f'POSITION ATOM={index}\n')
             for wall, bound in zip(walls, ion_z_bound):
                 f_w.write(f'{wall} '
-                          f'ARG={ion_name}.z AT={bound} '
+                          f'ARG={ion_name}.z '
+                          f'AT={bound: .3f} '
                           f'KAPPA={parameters["KAPPA"]} '
                           f'EXP={parameters["EXP"]} '
                           f'EPS={parameters["EPS"]} '
