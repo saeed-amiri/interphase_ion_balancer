@@ -83,7 +83,7 @@ class ProcessData:
     rough pdb_todf.py.
     """
 
-    info_msg: str = 'Message:\n'  # Message to pass for logging and writing
+    info_msg: str = 'Message from ProcessData:\n'  # Meesage
     atoms: pd.DataFrame  # All atoms dataframe
     param: dict[str, typing.Any]  # All the parameters from input file
     residues_atoms: dict[str, pd.DataFrame]  # Atoms info for each residue
@@ -225,7 +225,7 @@ class ProcessData:
             np_diameters.append(np.max(diameter))
         max_diameter: np.float64 = np.max(np_diameters)
         self.info_msg += \
-            f'\tMaximum radius of between all NPs: `{max_diameter/2}`\n'
+            f'\tMaximum radius between all NPs: `{max_diameter/2}`\n'
         return max_diameter
 
     def get_depth(self,
