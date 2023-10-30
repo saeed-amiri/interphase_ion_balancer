@@ -91,7 +91,7 @@ class ReadParam:
                              "INTERFACE_WIDTH", "ION_DISTANCE", "NP_ZLOC",
                              "WALL_NP_DISTANCE", "BOX_ION_DISTANCE",
                              "KAPPA", "OFFSET"]
-    integer_keys: list[str] = ["ION_ATTEMPTS", "EPS"]
+    integer_keys: list[str] = ["ION_ATTEMPTS", "EPS", "EXP"]
     boolen_keys: list[str] = ["READ", "DEBUG"]
     files_keys: list[str] = ["TOPOFILE", "index.ndx"]
     itp_keys: list[str] = ["NP_ITP"]

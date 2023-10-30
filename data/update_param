@@ -43,12 +43,14 @@ Number of times try to find a place for an ion, around 1000
 If True (any word will means True!) many data files will be written, with extension "debug"
 @DEBUG=True
 ###################### PLUMED ##################
-kappa
+kappa: is an energy constant in internal unit of the code!
 @KAPPA=150
 offset
 @OFFSET=0
-eps
+eps: a rescaling factor!
 @EPS=1
+exp: the exponent determining the power law
+@EXP=2
 index file name
 @INDEX=index.ndx
 output file name
