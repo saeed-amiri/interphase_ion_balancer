@@ -31,14 +31,31 @@ class WritePlumedInput:
                                                   parameters['ION'])
         with open(parameters['OUTNAME'], 'w', encoding='utf8') as f_w:
             f_w.write("# Set walls for the nanoparticles and ions\n\n")
-            self.write_np_wall(f_w, log)
+            f_w.write('# Walls on the nanopartcile\n')
+            self.write_np_wall(f_w, parameters)
+            f_w.write('# Walls on the ions\n')
             self.write_ions_wall(f_w, ions_ndx, parameters)
 
     def write_np_wall(self,
                       f_w: typing.IO,
-                      log: logger.logging.Logger
+                      parameters: dict[str, typing.Any]
                       ) -> None:
         """write the wall for the nanoparticles"""
+        f_w.write(f'nanop: GROUP NDX_FILE={parameters["INDEX"]} '
+                 f'NDX_GROUP={parameters["NP"]}\n')
+        f_w.write(f'cnp: CENTER ATOMS=nanop\n')
+        f_w.write(f'posnp: POSITION ATOM=cnp\n')
+        f_w.write(f'dabs: CUSTOM ARG=posnp.z FUNC=sqrt(x*x) PERIODIC=NO\n')
+        f_w.write(f'uwall_cnp: UPPER_WALLS ARG=dabs '
+                  f'AT={parameters["NPCOMZ"]+0.1:.3f} '
+                  f'KAPPA={parameters["KAPPA"]} '
+                  f'EXP={parameters["EXP"]} EPS={parameters["EPS"]} '
+                  f'OFFSET={parameters["OFFSET"]}\n')
+        f_w.write(f'dwall_cnp: LOWER_WALLS ARG=dabs '
+                  f'AT={parameters["NPCOMZ"]-0.05: .3f} '
+                  f'KAPPA={parameters["KAPPA"]} '
+                  f'EXP={parameters["EXP"]} EPS={parameters["EPS"]} '
+                  f'OFFSET={parameters["OFFSET"]}\n\n')
 
     def write_ions_wall(self,
                         f_w: typing.IO,
@@ -57,7 +74,7 @@ class WritePlumedInput:
             for wall, bound in zip(walls, ion_z_bound):
                 f_w.write(f'{wall} '
                           f'ARG={ion_name}.z '
-                          f'AT={bound: .3f} '
+                          f'AT={bound:.3f} '
                           f'KAPPA={parameters["KAPPA"]} '
                           f'EXP={parameters["EXP"]} '
                           f'EPS={parameters["EPS"]} '
