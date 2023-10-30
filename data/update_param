@@ -55,3 +55,7 @@ index file name
 @INDEX=index.ndx
 output file name
 @OUTNAME=plumed_wall.dat
+ions lowest position
+@IONLOW=0.5
+ions highest position
+@IONHIGH=2.5
