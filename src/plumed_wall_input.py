@@ -41,6 +41,8 @@ class WritePlumedInput:
                       parameters: dict[str, typing.Any]
                       ) -> None:
         """write the wall for the nanoparticles"""
+        self.info_msg += f'\tThe plumed file is: `{parameters["OUTNAME"]}`\n'
+        self.info_msg += f'\tThe index file is: `{parameters["INDEX"]}`\n'
         f_w.write(f'nanop: GROUP NDX_FILE={parameters["INDEX"]} '
                  f'NDX_GROUP={parameters["NP"]}\n')
         f_w.write(f'cnp: CENTER ATOMS=nanop\n')
