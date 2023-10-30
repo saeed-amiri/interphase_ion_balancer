@@ -104,3 +104,21 @@ def extract_string(input_string: str) -> list[typing.Any]:
     # Find all occurrences of the pattern
     matches = re.findall(pattern, input_string)
     return matches
+
+
+def extract_text_between_square_brackets(input_string: str
+                                         ) -> typing.Union[str, None]:
+    """
+    Define a regular expression pattern to match text between square
+    brackets"""
+    pattern = r'\[([^]]+)\]'
+
+    # Use re.search to find the first match
+    match = re.search(pattern, input_string)
+
+    # Check if a match was found
+    if match:
+        # Extract the text between square brackets (group 1)
+        extracted_text = match.group(1)
+        return extracted_text
+    return None
