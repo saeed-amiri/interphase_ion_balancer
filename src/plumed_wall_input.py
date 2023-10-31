@@ -54,7 +54,7 @@ class WritePlumedInput:
                   f'EXP={parameters["EXP"]} EPS={parameters["EPS"]} '
                   f'OFFSET={parameters["OFFSET"]}\n')
         f_w.write(f'dwall_cnp: LOWER_WALLS ARG=dabs '
-                  f'AT={parameters["NPCOMZ"]-0.05: .3f} '
+                  f'AT={parameters["NPCOMZ"]-0.05:.3f} '
                   f'KAPPA={parameters["KAPPA"]} '
                   f'EXP={parameters["EXP"]} EPS={parameters["EPS"]} '
                   f'OFFSET={parameters["OFFSET"]}\n\n')
