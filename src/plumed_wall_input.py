@@ -44,10 +44,10 @@ class WritePlumedInput:
         self.info_msg += f'\tThe plumed file is: `{parameters["OUTNAME"]}`\n'
         self.info_msg += f'\tThe index file is: `{parameters["INDEX"]}`\n'
         f_w.write(f'nanop: GROUP NDX_FILE={parameters["INDEX"]} '
-                 f'NDX_GROUP={parameters["NP"]}\n')
-        f_w.write(f'cnp: CENTER ATOMS=nanop\n')
-        f_w.write(f'posnp: POSITION ATOM=cnp\n')
-        f_w.write(f'dabs: CUSTOM ARG=posnp.z FUNC=sqrt(x*x) PERIODIC=NO\n')
+                  f'NDX_GROUP={parameters["NP"]}\n')
+        f_w.write(f'cnp: CENTER ATOMS=nanop\n'
+                  f'posnp: POSITION ATOM=cnp\n'
+                  f'dabs: CUSTOM ARG=posnp.z FUNC=sqrt(x*x) PERIODIC=NO\n')
         f_w.write(f'uwall_cnp: UPPER_WALLS ARG=dabs '
                   f'AT={parameters["NPCOMZ"]+0.1:.3f} '
                   f'KAPPA={parameters["KAPPA"]} '
