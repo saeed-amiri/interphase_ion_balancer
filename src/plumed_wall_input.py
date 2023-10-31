@@ -18,11 +18,10 @@ class WritePlumedInput:
                  log: logger.logging.Logger,
                  parameters: dict[str, typing.Any],
                  ) -> None:
-        self.write_inputs(log, parameters)
+        self.write_inputs(parameters)
         self.write_log_msg(log)
 
     def write_inputs(self,
-                     log: logger.logging.Logger,
                      parameters: dict[str, typing.Any]
                      ) -> None:
         """write down based on the format"""
@@ -45,15 +44,15 @@ class WritePlumedInput:
         self.info_msg += f'\tThe index file is: `{parameters["INDEX"]}`\n'
         f_w.write(f'nanop: GROUP NDX_FILE={parameters["INDEX"]} '
                   f'NDX_GROUP={parameters["NP"]}\n')
-        f_w.write(f'cnp: CENTER ATOMS=nanop\n'
-                  f'posnp: POSITION ATOM=cnp\n'
-                  f'dabs: CUSTOM ARG=posnp.z FUNC=sqrt(x*x) PERIODIC=NO\n')
-        f_w.write(f'uwall_cnp: UPPER_WALLS ARG=dabs '
+        f_w.write('cnp: CENTER ATOMS=nanop\n'
+                  'posnp: POSITION ATOM=cnp\n'
+                  'dabs: CUSTOM ARG=posnp.z FUNC=sqrt(x*x) PERIODIC=NO\n')
+        f_w.write('uwall_cnp: UPPER_WALLS ARG=dabs '
                   f'AT={parameters["NPCOMZ"]+0.1:.3f} '
                   f'KAPPA={parameters["KAPPA"]} '
                   f'EXP={parameters["EXP"]} EPS={parameters["EPS"]} '
                   f'OFFSET={parameters["OFFSET"]}\n')
-        f_w.write(f'dwall_cnp: LOWER_WALLS ARG=dabs '
+        f_w.write('dwall_cnp: LOWER_WALLS ARG=dabs '
                   f'AT={parameters["NPCOMZ"]-0.05:.3f} '
                   f'KAPPA={parameters["KAPPA"]} '
                   f'EXP={parameters["EXP"]} EPS={parameters["EPS"]} '
