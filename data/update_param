@@ -70,4 +70,4 @@ restraints force on atoms
 @FX=0
 @FY=0
 @FZ=5000
-@RESFILE='ION_RESTRAINS.itp'
+@RESFILE='ION_RESTRAINTS.itp'
